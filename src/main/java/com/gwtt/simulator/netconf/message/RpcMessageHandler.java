@@ -42,16 +42,39 @@ public class RpcMessageHandler extends AbstractMessageHandler implements Message
 			if (rpc != null) {
 				log.debug("this rpc is {}", rpc);
 
-				String filterType = rpc.getGet().getFilter().getType();
-				if ("subtree".equals(filterType) || filterType == null) {
-					filterBySubtree(capabilities, rpc.getMessageId(), requestMsg);
+				if (rpc.getGet() != null) {
+					String filterType = rpc.getGet().getFilter().getType();
+					handleGet(capabilities, rpc.getMessageId(), filterType, requestMsg);
+					bo = true;
+				} else if (rpc.getCloseSession() != null) {
+					handleCloseSession(capabilities, rpc.getMessageId());
 				}
+
 				bo = true;
 			}
 		} catch (XstreamException e) {
 			log.debug("check messsage is not rpc");
 		}
 		return bo;
+	}
+
+	private void handleCloseSession(Capabilities capabilities, Integer messageId) {
+		try {
+			RpcReply reply = new RpcReply();
+			reply.setMessageId(messageId);
+			reply.setOk("");
+			String replyXml = XstreamUtil.toXML(reply);
+			writeReply(output, capabilities, replyXml);
+		} catch (XstreamException e) {
+			log.error("send close session reply err", e);
+		}
+
+	}
+
+	private void handleGet(Capabilities capabilities, Integer messageId, String filterType, String requestMsg) {
+		if ("subtree".equals(filterType) || filterType == null) {
+			filterBySubtree(capabilities, messageId, requestMsg);
+		}
 	}
 
 	/**

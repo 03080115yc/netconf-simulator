@@ -21,6 +21,8 @@ public class RpcReply extends XstreamModel {
 	
 	private RpcData data;
 	
+	private String ok;
+	
 	public RpcReply(){
 		super("urn:ietf:params:xml:ns:netconf:base:1.0");
 	}

@@ -18,6 +18,9 @@ public class Rpc extends XstreamModel {
 
 	private Get get;
 	
+	@XStreamAlias("close-session")
+	private String closeSession;
+	
 	public Rpc() {
 		super("urn:ietf:params:xml:ns:netconf:base:1.0");
 	}
