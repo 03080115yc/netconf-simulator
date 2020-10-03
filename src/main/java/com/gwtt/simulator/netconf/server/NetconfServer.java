@@ -8,6 +8,7 @@ import org.apache.sshd.server.ServerFactoryManager;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 
+import com.gwtt.simulator.netconf.message.NotificationSender;
 import com.gwtt.simulator.netconf.subsystem.NetconfSubsystemFacotry;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +46,7 @@ public class NetconfServer {
 
 	public void start() throws IOException {
 		sshServer.start();
-		while (true) {
-		}
+		NotificationSender.start();
 	}
 
 }

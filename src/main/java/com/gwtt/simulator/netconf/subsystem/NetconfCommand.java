@@ -31,9 +31,13 @@ public class NetconfCommand implements Command {
 	@Override
 	public void start(ChannelSession channel, Environment env) throws IOException {
 		log.debug("start command and session is {}, env is {}", channel, env);
-		processor = new NetconfProcessor(in, out, err);
-		processor.registerHandler(new HelloMessageHandler(out));
-		processor.registerHandler(new RpcMessageHandler(out));
+		NetconfClient client = new NetconfClient();
+		client.setInput(in);
+		client.setOutput(out);
+
+		processor = new NetconfProcessor(client);
+		processor.registerHandler(new HelloMessageHandler());
+		processor.registerHandler(new RpcMessageHandler());
 		
 		new Thread(processor, "Netconf processor").start();
 	}

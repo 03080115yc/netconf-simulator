@@ -24,18 +24,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NetconfProcessor implements Runnable {
 
-	private InputStream input;
-	private OutputStream output;
-	private OutputStream err;
+	
+	private NetconfClient client;
 
 	private boolean active = true;
 	private List<MessageHandler> handlerList = new ArrayList<>();
 	private Capabilities clientCapabilities;
 
-	public NetconfProcessor(InputStream input, OutputStream output, OutputStream err) {
-		this.input = input;
-		this.output = output;
-		this.err = err;
+	public NetconfProcessor(NetconfClient client) {
+		this.client = client;
 	}
 
 	@Override
@@ -43,7 +40,7 @@ public class NetconfProcessor implements Runnable {
 		StringBuilder msg = new StringBuilder();
 		BufferedReader bufferReader = null;
 		try {
-			bufferReader = new BufferedReader(new InputStreamReader(input, Constants.MESSAGE_CHARSET));
+			bufferReader = new BufferedReader(new InputStreamReader(client.getInput(), Constants.MESSAGE_CHARSET));
 		} catch (UnsupportedEncodingException e1) {
 			log.error("generate bufferreader err", e1);
 		}
@@ -83,10 +80,10 @@ public class NetconfProcessor implements Runnable {
 		boolean bo = false;
 		for (int i = 0; !bo && i < handlerList.size(); i++) {
 			MessageHandler handler = handlerList.get(i);
-			bo = handler.handle(clientCapabilities, requestMsg);
-			if (bo && handler instanceof HelloMessageHandler) {
-				clientCapabilities = ((HelloMessageHandler) handler).getClientCapabilities();
-			}
+			bo = handler.handle(client, requestMsg);
+//			if (bo && handler instanceof HelloMessageHandler) {
+//				clientCapabilities = ((HelloMessageHandler) handler).getClientCapabilities();
+//			}
 		}
 
 		if (!bo) {

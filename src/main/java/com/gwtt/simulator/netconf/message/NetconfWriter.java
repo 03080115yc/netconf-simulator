@@ -10,20 +10,13 @@ import com.gwtt.simulator.netconf.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AbstractMessageHandler implements MessageHandler {
+public abstract class NetconfWriter {
 
-	protected void writeReply(OutputStream output, Capabilities capabilities, String body) {
-		try {
-			String message = formatMessageHeader(body);
-			message = formatMessageChunked(message, capabilities);
-			output.write(message.getBytes(Constants.MESSAGE_CHARSET));
-			output.flush();
-			log.debug("send reply \n{}", message);
-		} catch (Exception e) {
-			log.error("write reply err the message is {}", body, e);
-		}
-
-	}
+	public static final String MESSAGE_HEADER = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+	public static final String MESSAGE_NEWLINE = "\n";
+	public static final String HASH = "#";
+	public static final String LF = "\n";
+	public static final String MSGLEN_REGEX_PATTERN = "\n#\\d+\n";
 
 	/**
 	 * 加消息头
@@ -61,6 +54,19 @@ public abstract class AbstractMessageHandler implements MessageHandler {
 			message = message + Constants.MESSAGE_END_MARK;
 		}
 		return message;
+	}
+
+	protected void writeMessage(OutputStream output, Capabilities capabilities, String body) {
+		try {
+			String message = formatMessageHeader(body);
+			message = formatMessageChunked(message, capabilities);
+			output.write(message.getBytes(Constants.MESSAGE_CHARSET));
+			output.flush();
+			log.debug("send reply \n{}", message);
+		} catch (Exception e) {
+			log.error("write reply err the message is {}", body, e);
+		}
+
 	}
 
 }
